@@ -358,6 +358,13 @@
 
         const imageUrl = getImageUrlFromParams();
 
+        // Debug: Ver qué hay en sessionStorage al cargar
+        console.log('Al cargar la página:', {
+          shouldShowPhoto: sessionStorage.getItem('shouldShowPhoto'),
+          storedPhotoUrl: sessionStorage.getItem('photoUrl'),
+          currentImageUrl: imageUrl,
+        });
+
         if (!imageUrl) {
           // Si no hay parámetro de imagen, mostrar URL de ejemplo
           errorMessage.style.display = 'block';
@@ -372,6 +379,7 @@
           sessionStorage.getItem('shouldShowPhoto') === 'true' &&
           sessionStorage.getItem('photoUrl') === imageUrl
         ) {
+          console.log('¡Mostrando foto automáticamente!');
           // Mostrar directamente la foto cuando vuelve del formulario
           initialContent.style.display = 'none';
           loadingSpinner.style.display = 'block';
@@ -399,17 +407,32 @@
 
           img.src = imageUrl;
 
-          // Limpiar el sessionStorage para futuras visitas
-          sessionStorage.removeItem('shouldShowPhoto');
-          sessionStorage.removeItem('photoUrl');
+          // NO limpiar el sessionStorage aquí, mantenerlo por si el usuario navega de nuevo
+          // Solo se limpiará cuando haga clic en el botón otra vez o cierre la pestaña
+          // sessionStorage.removeItem('shouldShowPhoto');
+          // sessionStorage.removeItem('photoUrl');
         }
 
         // Manejar el clic del enlace CTA
         ctaButton.addEventListener('click', function (e) {
+          // Prevenir la navegación por defecto temporalmente
+          e.preventDefault();
+
           // Guardar en sessionStorage que debe mostrar la foto cuando vuelva
           sessionStorage.setItem('shouldShowPhoto', 'true');
           sessionStorage.setItem('photoUrl', imageUrl);
-          // El enlace seguirá su curso normal y navegará al formulario
+
+          // Debug: verificar que se guardó
+          console.log('Guardado en sessionStorage:', {
+            shouldShowPhoto: sessionStorage.getItem('shouldShowPhoto'),
+            photoUrl: sessionStorage.getItem('photoUrl'),
+          });
+
+          // Navegar manualmente después de un pequeño delay para asegurar que se guarde
+          const targetUrl = e.currentTarget.href;
+          setTimeout(() => {
+            window.location.href = targetUrl;
+          }, 100);
         });
 
         // Mejorar la experiencia de descarga en móvil
