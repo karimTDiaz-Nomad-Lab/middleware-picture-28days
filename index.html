@@ -383,13 +383,6 @@
         ) {
           console.log('¡Mostrando foto automáticamente!');
 
-          // Forzar refresh si es necesario (para algunos navegadores)
-          if (sessionStorage.getItem('needsRefresh') === 'true') {
-            sessionStorage.removeItem('needsRefresh');
-            window.location.reload();
-            return;
-          }
-
           // Mostrar directamente la foto cuando vuelve del formulario
           initialContent.style.display = 'none';
           loadingSpinner.style.display = 'block';
@@ -417,8 +410,10 @@
 
           img.src = imageUrl;
 
-          // Limpiar el flag después de mostrar la foto
-          sessionStorage.setItem('shouldShowPhoto', 'false');
+          // Marcar que ya se mostró la foto para evitar loops
+          sessionStorage.removeItem('shouldShowPhoto');
+          // Mantener la URL por si acaso
+          // sessionStorage.removeItem('photoUrl');
         }
 
         // Manejar el clic del enlace CTA solo si existe
@@ -436,9 +431,6 @@
               shouldShowPhoto: sessionStorage.getItem('shouldShowPhoto'),
               photoUrl: sessionStorage.getItem('photoUrl'),
             });
-
-            // Marcar que podría necesitar refresh en algunos navegadores
-            sessionStorage.setItem('needsRefresh', 'true');
 
             // Navegar manualmente después de un pequeño delay para asegurar que se guarde
             const targetUrl = e.currentTarget.href;
@@ -498,19 +490,13 @@
       window.addEventListener('pageshow', function (event) {
         console.log('pageshow event - persisted:', event.persisted);
         // Si la página viene del caché del navegador (back/forward cache)
-        if (event.persisted || performance.navigation.type === 2) {
-          console.log('Página restaurada desde caché, reinicializando...');
-          // Reinicializar la página
-          initializePage();
-        }
-      });
-
-      // Alternativa: Forzar recarga cuando vuelves atrás
-      window.addEventListener('focus', function () {
-        // Verificar si debemos mostrar la foto
-        if (sessionStorage.getItem('shouldShowPhoto') === 'true') {
-          console.log('Window focus detectado, verificando estado...');
-          initializePage();
+        if (event.persisted) {
+          console.log('Página restaurada desde caché');
+          // Solo reinicializar si hay que mostrar la foto
+          if (sessionStorage.getItem('shouldShowPhoto') === 'true') {
+            console.log('Mostrando foto desde pageshow...');
+            initializePage();
+          }
         }
       });
 
