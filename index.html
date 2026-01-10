@@ -257,12 +257,14 @@
         <p style="text-align: center; font-size: 1.1rem; margin-bottom: 10px">
           ¿Te atreves a ver tu transformación?
         </p>
-        <button
+        <a
           id="ctaButton"
+          href="https://www.sonypictures.es/form/28-ad-peor-selfie"
           class="cta-button"
+          style="display: inline-block; text-decoration: none"
         >
           PULSA PARA OBTENER TU FOTO
-        </button>
+        </a>
       </div>
 
       <div
@@ -280,6 +282,21 @@
             class="photo"
             alt="Tu Peor Selfie - 28 Días Después"
           />
+        </div>
+        <div
+          id="redirectMessage"
+          style="
+            display: none;
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 51, 51, 0.2);
+            border-radius: 10px;
+            margin: 10px 0;
+          "
+        >
+          <p style="color: #ff6666; font-weight: bold; font-size: 1.1rem">
+            Redirigiendo al formulario de Sony Pictures...
+          </p>
         </div>
         <a
           id="downloadButton"
@@ -350,48 +367,49 @@
           return;
         }
 
-        // Manejar el clic del botón CTA
-        ctaButton.addEventListener('click', function () {
-          // Mostrar spinner de carga
+        // Verificar si el usuario está volviendo desde el formulario
+        if (
+          sessionStorage.getItem('shouldShowPhoto') === 'true' &&
+          sessionStorage.getItem('photoUrl') === imageUrl
+        ) {
+          // Mostrar directamente la foto cuando vuelve del formulario
           initialContent.style.display = 'none';
           loadingSpinner.style.display = 'block';
 
-          // Abrir la ventana de Sony Pictures
-          window.open(
-            'https://www.sonypictures.es/form/28-ad-peor-selfie',
-            '_blank'
-          );
-
-          // Cargar y mostrar la imagen
+          // Cargar la imagen
           const img = new Image();
           img.onload = function () {
-            // Imagen cargada correctamente
             userPhoto.src = imageUrl;
             downloadButton.href = imageUrl;
-
-            // Ocultar spinner y mostrar foto
             loadingSpinner.style.display = 'none';
             photoContainer.style.display = 'flex';
-
-            // Animar la aparición
             setTimeout(() => {
               photoContainer.style.opacity = '1';
             }, 100);
           };
 
           img.onerror = function () {
-            // Error al cargar la imagen
             loadingSpinner.style.display = 'none';
             errorMessage.style.display = 'block';
             errorMessage.innerHTML = `
-                        <p><strong>Error:</strong> No se pudo cargar la imagen.</p>
-                        <p>URL: ${imageUrl}</p>
-                        <p style="margin-top: 10px;">Por favor, verifica que el enlace sea correcto y accesible.</p>
-                    `;
+              <p><strong>Error:</strong> No se pudo cargar la imagen.</p>
+              <p>URL: ${imageUrl}</p>
+            `;
           };
 
-          // Intentar cargar la imagen
           img.src = imageUrl;
+
+          // Limpiar el sessionStorage para futuras visitas
+          sessionStorage.removeItem('shouldShowPhoto');
+          sessionStorage.removeItem('photoUrl');
+        }
+
+        // Manejar el clic del enlace CTA
+        ctaButton.addEventListener('click', function (e) {
+          // Guardar en sessionStorage que debe mostrar la foto cuando vuelva
+          sessionStorage.setItem('shouldShowPhoto', 'true');
+          sessionStorage.setItem('photoUrl', imageUrl);
+          // El enlace seguirá su curso normal y navegará al formulario
         });
 
         // Mejorar la experiencia de descarga en móvil
