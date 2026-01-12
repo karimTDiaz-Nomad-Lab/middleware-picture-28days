@@ -388,9 +388,6 @@
 
         const imageUrl = getImageUrlFromParams();
 
-        // Asegurar que el fondo sea el correcto al inicio
-        document.body.classList.remove('photo-view');
-
         // Debug: Ver qué hay en sessionStorage al cargar
         console.log('Al cargar/mostrar la página:', {
           shouldShowPhoto: sessionStorage.getItem('shouldShowPhoto'),
@@ -401,6 +398,7 @@
         if (!imageUrl) {
           // Si no hay parámetro de imagen, mostrar URL de ejemplo
           errorMessage.style.display = 'block';
+          document.body.classList.remove('photo-view');
           if (ctaButton) {
             ctaButton.style.opacity = '0.5';
             ctaButton.style.cursor = 'not-allowed';
@@ -454,6 +452,9 @@
 
           // Limpiar el flag después de mostrar la foto
           sessionStorage.setItem('shouldShowPhoto', 'false');
+        } else {
+          // Si no estamos mostrando la foto, asegurar que el fondo sea el inicial
+          document.body.classList.remove('photo-view');
         }
 
         // Manejar el clic del enlace CTA solo si existe
