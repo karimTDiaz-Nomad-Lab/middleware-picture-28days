@@ -476,6 +476,9 @@
             // Marcar que podría necesitar refresh en algunos navegadores
             sessionStorage.setItem('needsRefresh', 'true');
 
+            // Guardar timestamp para verificación
+            sessionStorage.setItem('navigationTime', Date.now().toString());
+
             // Navegar manualmente después de un pequeño delay para asegurar que se guarde
             const targetUrl = e.currentTarget.href;
             setTimeout(() => {
@@ -533,9 +536,20 @@
       // IMPORTANTE: Este evento se ejecuta cuando vuelves con el botón atrás
       window.addEventListener('pageshow', function (event) {
         console.log('pageshow event - persisted:', event.persisted);
+        console.log('navigation type:', performance.navigation.type);
+        console.log('sessionStorage en pageshow:', {
+          shouldShowPhoto: sessionStorage.getItem('shouldShowPhoto'),
+          photoUrl: sessionStorage.getItem('photoUrl'),
+        });
+
         // Si la página viene del caché del navegador (back/forward cache)
-        if (event.persisted || performance.navigation.type === 2) {
-          console.log('Página restaurada desde caché, reinicializando...');
+        // o si debemos mostrar la foto
+        if (
+          event.persisted ||
+          performance.navigation.type === 2 ||
+          sessionStorage.getItem('shouldShowPhoto') === 'true'
+        ) {
+          console.log('Reinicializando página...');
           // Reinicializar la página
           initializePage();
         }
@@ -546,7 +560,40 @@
         // Verificar si debemos mostrar la foto
         if (sessionStorage.getItem('shouldShowPhoto') === 'true') {
           console.log('Window focus detectado, verificando estado...');
-          initializePage();
+          // Si el contenedor de fotos no está visible, forzar inicialización
+          const photoContainer = document.getElementById('photoContainer');
+          if (photoContainer && photoContainer.style.display !== 'flex') {
+            console.log('Foto no visible, forzando inicialización...');
+            initializePage();
+          }
+        }
+      });
+
+      // Verificación adicional al cargar
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          if (sessionStorage.getItem('shouldShowPhoto') === 'true') {
+            const photoContainer = document.getElementById('photoContainer');
+            if (photoContainer && photoContainer.style.display !== 'flex') {
+              console.log('Verificación post-carga: forzando mostrar foto');
+              initializePage();
+            }
+          }
+        }, 100);
+      });
+
+      // Detectar navegación con botón atrás/adelante
+      window.addEventListener('popstate', function (event) {
+        console.log('Popstate event detectado');
+        if (sessionStorage.getItem('shouldShowPhoto') === 'true') {
+          const photoContainer = document.getElementById('photoContainer');
+          if (photoContainer && photoContainer.style.display !== 'flex') {
+            console.log('Popstate: forzando mostrar foto');
+            // Pequeño delay para asegurar que el DOM esté listo
+            setTimeout(function () {
+              initializePage();
+            }, 50);
+          }
         }
       });
 
