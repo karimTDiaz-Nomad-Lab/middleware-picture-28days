@@ -398,7 +398,6 @@
         if (!imageUrl) {
           // Si no hay parámetro de imagen, mostrar URL de ejemplo
           errorMessage.style.display = 'block';
-          document.body.classList.remove('photo-view');
           if (ctaButton) {
             ctaButton.style.opacity = '0.5';
             ctaButton.style.cursor = 'not-allowed';
@@ -414,18 +413,9 @@
         ) {
           console.log('¡Mostrando foto automáticamente!');
 
-          // Forzar refresh si es necesario (para algunos navegadores)
-          if (sessionStorage.getItem('needsRefresh') === 'true') {
-            sessionStorage.removeItem('needsRefresh');
-            window.location.reload();
-            return;
-          }
-
           // Mostrar directamente la foto cuando vuelve del formulario
           initialContent.style.display = 'none';
           loadingSpinner.style.display = 'block';
-          // Cambiar al fondo 2
-          document.body.classList.add('photo-view');
 
           // Cargar la imagen
           const img = new Image();
@@ -450,11 +440,10 @@
 
           img.src = imageUrl;
 
-          // Limpiar el flag después de mostrar la foto
+          // Marcar que ya se mostró la foto para evitar loops
           sessionStorage.setItem('shouldShowPhoto', 'false');
-        } else {
-          // Si no estamos mostrando la foto, asegurar que el fondo sea el inicial
-          document.body.classList.remove('photo-view');
+          // Mantener la URL por si acaso
+          // sessionStorage.removeItem('photoUrl');
         }
 
         // Manejar el clic del enlace CTA solo si existe
@@ -472,12 +461,6 @@
               shouldShowPhoto: sessionStorage.getItem('shouldShowPhoto'),
               photoUrl: sessionStorage.getItem('photoUrl'),
             });
-
-            // Marcar que podría necesitar refresh en algunos navegadores
-            sessionStorage.setItem('needsRefresh', 'true');
-
-            // Guardar timestamp para verificación
-            sessionStorage.setItem('navigationTime', Date.now().toString());
 
             // Navegar manualmente después de un pequeño delay para asegurar que se guarde
             const targetUrl = e.currentTarget.href;
@@ -536,63 +519,13 @@
       // IMPORTANTE: Este evento se ejecuta cuando vuelves con el botón atrás
       window.addEventListener('pageshow', function (event) {
         console.log('pageshow event - persisted:', event.persisted);
-        console.log('navigation type:', performance.navigation.type);
-        console.log('sessionStorage en pageshow:', {
-          shouldShowPhoto: sessionStorage.getItem('shouldShowPhoto'),
-          photoUrl: sessionStorage.getItem('photoUrl'),
-        });
-
         // Si la página viene del caché del navegador (back/forward cache)
-        // o si debemos mostrar la foto
-        if (
-          event.persisted ||
-          performance.navigation.type === 2 ||
-          sessionStorage.getItem('shouldShowPhoto') === 'true'
-        ) {
-          console.log('Reinicializando página...');
-          // Reinicializar la página
-          initializePage();
-        }
-      });
-
-      // Alternativa: Forzar recarga cuando vuelves atrás
-      window.addEventListener('focus', function () {
-        // Verificar si debemos mostrar la foto
-        if (sessionStorage.getItem('shouldShowPhoto') === 'true') {
-          console.log('Window focus detectado, verificando estado...');
-          // Si el contenedor de fotos no está visible, forzar inicialización
-          const photoContainer = document.getElementById('photoContainer');
-          if (photoContainer && photoContainer.style.display !== 'flex') {
-            console.log('Foto no visible, forzando inicialización...');
-            initializePage();
-          }
-        }
-      });
-
-      // Verificación adicional al cargar
-      window.addEventListener('load', function () {
-        setTimeout(function () {
+        if (event.persisted) {
+          console.log('Página restaurada desde caché');
+          // Solo reinicializar si hay que mostrar la foto
           if (sessionStorage.getItem('shouldShowPhoto') === 'true') {
-            const photoContainer = document.getElementById('photoContainer');
-            if (photoContainer && photoContainer.style.display !== 'flex') {
-              console.log('Verificación post-carga: forzando mostrar foto');
-              initializePage();
-            }
-          }
-        }, 100);
-      });
-
-      // Detectar navegación con botón atrás/adelante
-      window.addEventListener('popstate', function (event) {
-        console.log('Popstate event detectado');
-        if (sessionStorage.getItem('shouldShowPhoto') === 'true') {
-          const photoContainer = document.getElementById('photoContainer');
-          if (photoContainer && photoContainer.style.display !== 'flex') {
-            console.log('Popstate: forzando mostrar foto');
-            // Pequeño delay para asegurar que el DOM esté listo
-            setTimeout(function () {
-              initializePage();
-            }, 50);
+            console.log('Mostrando foto desde pageshow...');
+            initializePage();
           }
         }
       });
