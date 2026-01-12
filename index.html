@@ -17,12 +17,32 @@
       body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
           'Helvetica Neue', Arial, sans-serif;
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        background-image: url('./assets/background_1.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
         color: #ffffff;
         overflow-x: hidden;
+        transition: background-image 0.8s ease-in-out;
+      }
+
+      body.photo-view {
+        background-image: url('./assets/background_2.jpg');
+      }
+
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: -1;
       }
 
       .container {
@@ -33,6 +53,8 @@
         justify-content: center;
         padding: 20px;
         animation: fadeIn 0.5s ease-in;
+        position: relative;
+        z-index: 1;
       }
 
       @keyframes fadeIn {
@@ -77,57 +99,59 @@
       }
 
       .initial-content {
+        position: absolute;
+        bottom: 12vh;
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 20px;
         padding: 20px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.1);
       }
 
       .cta-button {
-        background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
-        color: white;
+        position: relative;
+        background-image: url('./assets/boton.png');
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 30vw;
+        height: 10vh;
         border: none;
-        padding: 18px 40px;
-        font-size: 1.1rem;
-        font-weight: bold;
-        border-radius: 50px;
         cursor: pointer;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(255, 51, 51, 0.4);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        position: relative;
         overflow: hidden;
-      }
-
-      .cta-button:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.2);
-        transition: left 0.5s ease;
-      }
-
-      .cta-button:hover:before {
-        left: 100%;
-      }
-
-      .cta-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(255, 51, 51, 0.5);
       }
 
       .cta-button:active {
         transform: translateY(0);
+      }
+
+      .text-svg {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+      }
+
+      .text-1 {
+        animation: fadeInUp 0.8s ease-out;
+      }
+
+      .text-2 {
+        width: 70%;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       .photo-container {
@@ -168,30 +192,32 @@
       }
 
       .download-button {
-        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-        color: white;
+        background-image: url('./assets/download_button.png');
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 250px;
+        height: 70px;
+        display: block;
         border: none;
-        padding: 15px 30px;
-        font-size: 1rem;
-        font-weight: bold;
-        border-radius: 50px;
         cursor: pointer;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
         text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
       }
 
       .download-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+        transform: scale(1.05);
+        filter: brightness(1.1);
       }
 
-      .download-button svg {
-        width: 20px;
-        height: 20px;
+      .download-button:active {
+        transform: scale(0.95);
+      }
+
+      .text-3 {
+        width: 100%;
+        max-width: 350px;
+        margin-top: 20px;
       }
 
       .warning-text {
@@ -245,6 +271,19 @@
           padding: 16px 32px;
           font-size: 1rem;
         }
+
+        .text-svg {
+          max-width: 300px;
+        }
+
+        .download-button {
+          width: 200px;
+          height: 56px;
+        }
+
+        .text-3 {
+          max-width: 280px;
+        }
       }
     </style>
   </head>
@@ -254,16 +293,21 @@
         id="initialContent"
         class="initial-content"
       >
-        <p style="text-align: center; font-size: 1.1rem; margin-bottom: 10px">
-          ¿Te atreves a ver tu transformación?
-        </p>
+        <img
+          src="./assets/text-1.svg"
+          alt="Te atreves"
+          class="text-svg text-1"
+        />
+        <img
+          src="./assets/text-2.svg"
+          alt="A ver tu transformación"
+          class="text-svg text-2"
+        />
         <a
           id="ctaButton"
           href="https://www.sonypictures.es/form/28-ad-peor-selfie"
           class="cta-button"
-          style="display: inline-block; text-decoration: none"
         >
-          PULSA PARA OBTENER TU FOTO
         </a>
       </div>
 
@@ -303,26 +347,8 @@
           class="download-button"
           download="mi-peor-selfie-28-dias-despues.jpg"
         >
-          <svg
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-            ></path>
-          </svg>
-          DESCARGAR FOTO
         </a>
-        <p
-          style="
-            text-align: center;
-            color: #aaa;
-            font-size: 0.9rem;
-            margin-top: 10px;
-          "
-        >
-          Mantén presionada la imagen para guardarla en tu dispositivo
-        </p>
+        <img src="./assets/text-3.svg" alt="Mantén presionada la imagen" class="text-svg text-3" />
       </div>
 
       <div
@@ -358,6 +384,9 @@
 
         const imageUrl = getImageUrlFromParams();
 
+        // Asegurar que el fondo sea el correcto al inicio
+        document.body.classList.remove('photo-view');
+
         // Debug: Ver qué hay en sessionStorage al cargar
         console.log('Al cargar/mostrar la página:', {
           shouldShowPhoto: sessionStorage.getItem('shouldShowPhoto'),
@@ -383,9 +412,18 @@
         ) {
           console.log('¡Mostrando foto automáticamente!');
 
+          // Forzar refresh si es necesario (para algunos navegadores)
+          if (sessionStorage.getItem('needsRefresh') === 'true') {
+            sessionStorage.removeItem('needsRefresh');
+            window.location.reload();
+            return;
+          }
+
           // Mostrar directamente la foto cuando vuelve del formulario
           initialContent.style.display = 'none';
           loadingSpinner.style.display = 'block';
+          // Cambiar al fondo 2
+          document.body.classList.add('photo-view');
 
           // Cargar la imagen
           const img = new Image();
@@ -410,10 +448,8 @@
 
           img.src = imageUrl;
 
-          // Marcar que ya se mostró la foto para evitar loops
-          sessionStorage.removeItem('shouldShowPhoto');
-          // Mantener la URL por si acaso
-          // sessionStorage.removeItem('photoUrl');
+          // Limpiar el flag después de mostrar la foto
+          sessionStorage.setItem('shouldShowPhoto', 'false');
         }
 
         // Manejar el clic del enlace CTA solo si existe
@@ -431,6 +467,9 @@
               shouldShowPhoto: sessionStorage.getItem('shouldShowPhoto'),
               photoUrl: sessionStorage.getItem('photoUrl'),
             });
+
+            // Marcar que podría necesitar refresh en algunos navegadores
+            sessionStorage.setItem('needsRefresh', 'true');
 
             // Navegar manualmente después de un pequeño delay para asegurar que se guarde
             const targetUrl = e.currentTarget.href;
@@ -490,13 +529,19 @@
       window.addEventListener('pageshow', function (event) {
         console.log('pageshow event - persisted:', event.persisted);
         // Si la página viene del caché del navegador (back/forward cache)
-        if (event.persisted) {
-          console.log('Página restaurada desde caché');
-          // Solo reinicializar si hay que mostrar la foto
-          if (sessionStorage.getItem('shouldShowPhoto') === 'true') {
-            console.log('Mostrando foto desde pageshow...');
-            initializePage();
-          }
+        if (event.persisted || performance.navigation.type === 2) {
+          console.log('Página restaurada desde caché, reinicializando...');
+          // Reinicializar la página
+          initializePage();
+        }
+      });
+
+      // Alternativa: Forzar recarga cuando vuelves atrás
+      window.addEventListener('focus', function () {
+        // Verificar si debemos mostrar la foto
+        if (sessionStorage.getItem('shouldShowPhoto') === 'true') {
+          console.log('Window focus detectado, verificando estado...');
+          initializePage();
         }
       });
 
