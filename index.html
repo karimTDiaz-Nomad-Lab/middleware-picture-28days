@@ -51,7 +51,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 20px;
+        gap: 20px;
         animation: fadeIn 0.5s ease-in;
         position: relative;
         z-index: 1;
@@ -98,23 +98,13 @@
         margin-bottom: 20px;
       }
 
-      .initial-content {
-        position: absolute;
-        bottom: 12vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-        padding: 20px;
-      }
-
       .cta-button {
         position: relative;
         background-image: url('./assets/boton.png');
         background-size: contain;
         background-position: center;
         background-repeat: no-repeat;
-        width: 30vw;
+        width: 50vw;
         height: 10vh;
         border: none;
         cursor: pointer;
@@ -155,12 +145,13 @@
       }
 
       .photo-container {
+        position: relative;
         display: none;
         flex-direction: column;
+       
         align-items: center;
         gap: 20px;
-        width: 100%;
-        max-width: 500px;
+        width: 100vw;
         animation: slideIn 0.5s ease-in;
       }
 
@@ -176,7 +167,8 @@
       }
 
       .photo-wrapper {
-        width: 100%;
+        position: relative;
+        width: 80%;
         background: rgba(255, 255, 255, 0.1);
         border-radius: 15px;
         padding: 10px;
@@ -192,12 +184,14 @@
       }
 
       .download-button {
+        position: absolute;
+        bottom:4%;
+        right:-18%;
         background-image: url('./assets/download_button.png');
         background-size: contain;
         background-position: center;
         background-repeat: no-repeat;
-        width: 250px;
-        height: 70px;
+        transform:scale(0.75);
         display: block;
         border: none;
         cursor: pointer;
@@ -205,14 +199,14 @@
         text-decoration: none;
       }
 
-      .download-button:hover {
+      /* .download-button:hover {
         transform: scale(1.05);
         filter: brightness(1.1);
-      }
+      } */
 
-      .download-button:active {
+      /* .download-button:active {
         transform: scale(0.95);
-      }
+      } */
 
       .text-3 {
         width: 100%;
@@ -284,38 +278,24 @@
         .text-3 {
           max-width: 280px;
         }
+        .text-4 {
+          max-width: 350px;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <div
-        id="initialContent"
-        class="initial-content"
-      >
-        <img
-          src="./assets/text-1.svg"
-          alt="Te atreves"
-          class="text-svg text-1"
-        />
-        <img
-          src="./assets/text-2.svg"
-          alt="A ver tu transformación"
-          class="text-svg text-2"
-        />
-        <a
-          id="ctaButton"
-          href="https://www.sonypictures.es/form/28-ad-peor-selfie"
-          class="cta-button"
-        >
-        </a>
-      </div>
 
+    <div class="container">
       <div
         id="loadingSpinner"
         class="loading-spinner"
       ></div>
-
+      <img
+      src="./assets/text-3.svg"
+      alt="Mantén presionada la imagen"
+      class="text-svg text-3"
+    />
       <div
         id="photoContainer"
         class="photo-container"
@@ -326,6 +306,12 @@
             class="photo"
             alt="Tu Peor Selfie - 28 Días Después"
           />
+          <a
+          id="downloadButton"
+          class="download-button"
+          download="mi-peor-selfie-28-dias-despues.jpg"
+        >
+        </a>
         </div>
         <div
           id="redirectMessage"
@@ -342,17 +328,17 @@
             Redirigiendo al formulario de Sony Pictures...
           </p>
         </div>
-        <a
-          id="downloadButton"
-          class="download-button"
-          download="mi-peor-selfie-28-dias-despues.jpg"
-        >
-        </a>
         <img
-          src="./assets/text-3.svg"
-          alt="Mantén presionada la imagen"
-          class="text-svg text-3"
-        />
+        src="./assets/text-4.svg"
+        alt="¡No lo guardes! Compártelo con tus amigos"
+        class="text-svg text-4"
+      />
+        <a
+        id="ctaButton"
+        href="https://www.sonypictures.es/form/28-ad-peor-selfie"
+        class="cta-button"
+      >
+      </a>
       </div>
 
       <div
@@ -389,11 +375,7 @@
         const imageUrl = getImageUrlFromParams();
 
         // Debug: Ver qué hay en sessionStorage al cargar
-        console.log('Al cargar/mostrar la página:', {
-          shouldShowPhoto: sessionStorage.getItem('shouldShowPhoto'),
-          storedPhotoUrl: sessionStorage.getItem('photoUrl'),
-          currentImageUrl: imageUrl,
-        });
+  
 
         if (!imageUrl) {
           // Si no hay parámetro de imagen, mostrar URL de ejemplo
@@ -407,16 +389,7 @@
         }
 
         // Verificar si el usuario está volviendo desde el formulario
-        if (
-          sessionStorage.getItem('shouldShowPhoto') === 'true' &&
-          sessionStorage.getItem('photoUrl') === imageUrl
-        ) {
-          console.log('¡Mostrando foto automáticamente!');
-
-          // Mostrar directamente la foto cuando vuelve del formulario
-          initialContent.style.display = 'none';
-          loadingSpinner.style.display = 'block';
-
+       
           // Cargar la imagen
           const img = new Image();
           img.onload = function () {
@@ -449,19 +422,7 @@
         // Manejar el clic del enlace CTA solo si existe
         if (ctaButton) {
           ctaButton.addEventListener('click', function (e) {
-            // Prevenir la navegación por defecto temporalmente
             e.preventDefault();
-
-            // Guardar en sessionStorage que debe mostrar la foto cuando vuelva
-            sessionStorage.setItem('shouldShowPhoto', 'true');
-            sessionStorage.setItem('photoUrl', imageUrl);
-
-            // Debug: verificar que se guardó
-            console.log('Guardado en sessionStorage:', {
-              shouldShowPhoto: sessionStorage.getItem('shouldShowPhoto'),
-              photoUrl: sessionStorage.getItem('photoUrl'),
-            });
-
             // Navegar manualmente después de un pequeño delay para asegurar que se guarde
             const targetUrl = e.currentTarget.href;
             setTimeout(() => {
@@ -506,7 +467,7 @@
             return true;
           });
         }
-      }
+      
 
       // Ejecutar cuando el DOM esté listo
       if (document.readyState === 'loading') {
